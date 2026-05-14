@@ -217,24 +217,33 @@ def chatbot_documental(request):
     """
     Asistente documental disponible solo para usuarios con rol postulante.
     No persiste conversaciones; responde una consulta puntual.
+    Soporta español e inglés (param opcional 'lang': 'es' | 'en').
     """
+    lang = request.data.get("lang")
+    if lang not in ("es", "en"):
+        lang = "es"
+
     try:
         perfil = request.user.perfil_documental
     except UsuarioPerfil.DoesNotExist:
-        return Response({"detail": "Usuario sin perfil documental."}, status=403)
+        msg = "User has no document profile." if lang == "en" else "Usuario sin perfil documental."
+        return Response({"detail": msg}, status=403)
 
     if perfil.rol != "postulante":
-        return Response({"detail": "Disponible solo para postulantes."}, status=403)
+        msg = "Available only for applicants." if lang == "en" else "Disponible solo para postulantes."
+        return Response({"detail": msg}, status=403)
 
     mensaje = request.data.get("message")
     if not isinstance(mensaje, str) or not mensaje.strip():
-        return Response({"detail": "El mensaje es obligatorio."}, status=400)
+        msg = "Message is required." if lang == "en" else "El mensaje es obligatorio."
+        return Response({"detail": msg}, status=400)
 
     mensaje = mensaje.strip()
     if len(mensaje) > 500:
-        return Response({"detail": "El mensaje no puede superar 500 caracteres."}, status=400)
+        msg = "Message cannot exceed 500 characters." if lang == "en" else "El mensaje no puede superar 500 caracteres."
+        return Response({"detail": msg}, status=400)
 
-    respuesta = responder_consulta_documental(mensaje)
+    respuesta = responder_consulta_documental(mensaje, lang=lang)
     return Response({"answer": respuesta})
 
 

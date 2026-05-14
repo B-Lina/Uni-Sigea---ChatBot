@@ -1,111 +1,357 @@
-<h2 align="left">
-    <img src= "https://github.com/user-attachments/assets/518854b5-fac7-41ab-b355-3bbe083167be#
-       alt="Logo SIGEA"
-       width="80"
-       style="vertical-align: left;">
-  UNI SIGEA - Documentación y Endpoints
+# UNI SIGEA - Chatbot Documental
 
-</h2>
+UNI SIGEA es una aplicacion web para la gestion documental de procesos de vinculacion. Permite administrar convocatorias, postulantes, expedientes y documentos requeridos, con apoyo de validaciones, semaforo documental y un chatbot para orientar al postulante.
 
-Este archivo contiene la referencia sobre la estructura del proyecto, las principales funcionalidades del sistema, así como los endpoints (API de backend) y los enlaces a las vistas (Frontend) correspondientes a los diferentes CRUD.
+El foco principal de esta version es el **chatbot documental bilingue**, disponible en el portal del postulante para responder preguntas en espanol e ingles sobre documentos, validaciones y carga de archivos.
 
-## Funcionalidades del Sistema
+## Que Hace El Chatbot
 
-Las características más destacadas de la plataforma incluyen:
+El chatbot ayuda al postulante con dudas relacionadas exclusivamente con el proceso documental de vinculacion.
 
-- **Carga y Validación de Documentos:** Los postulantes pueden subir de forma digital los documentos exigidos por cada convocatoria. Los administradores revisan y validan estos archivos con apoyo de un indicador de estado por semáforo.
-- **Gestión de Convocatorias:** Permite crear, modificar, detallar y archivar los distintos procesos de admisión.
-- **Portal del Postulante:** Espacio donde los candidatos pueden registrarse, enviar su información y dar seguimiento a sus trámites de admisión de manera integral.
-- **Administración de Expedientes:** Vista completa y organizada de los expedientes físicos/virtuales por aspirante, agilizando la revisión de cada caso.
-- **Gestión de Usuarios:** Control de acceso y administración de perfiles dentro de la plataforma.
+Puede responder sobre:
 
-## Estructura del Proyecto
+- Cedula o documento de identidad.
+- Hoja de vida.
+- Certificados laborales y academicos.
+- RUT.
+- Antecedentes judiciales, fiscales y disciplinarios.
+- Tratamiento de datos personales.
+- SG-SST.
+- REDAM.
+- Medidas correctivas.
+- Carga, revision, aprobacion o rechazo de documentos.
+- Enlaces oficiales para obtener documentos.
 
-El código está organizado en un monorepositorio que separa claramente el cliente del servidor. A continuación se detalla cada directorio principal:
+El usuario puede seleccionar el idioma desde la interfaz con los botones:
 
-### 🌐 Frontend (`/frontend/`)
+```txt
+ES | EN
+```
 
-La aplicación web está desarrollada como Single Page Application utilizando **React** con **TypeScript**, empaquetada con **Vite** y con estilos gestionados mediante **TailwindCSS**.
-Su estructura interna destacada es:
+El idioma elegido se envia al backend para que las respuestas sean coherentes en espanol o ingles.
 
-- `/src/components/`: Componentes de interfaz de usuario reutilizables (Botones, Modales, Tablas, etc.).
-- `/src/pages/`: Vistas completas de la aplicación (Dashboard, Convocatorias, Login, Rutas de Postulantes, etc.).
-- `/src/services/`: Funciones y utilidades para interactuar con la API del backend mediante peticiones HTTP.
-- `/src/hooks/`: Hooks personalizados de React encargados de aislar la lógica de negocio.
-- `/src/contexts/`: Manejo del estado global de la aplicación (Autenticación, Tema, etc.) vía Context API.
-- `/src/types/`: Definiciones estrictas de tipos o interfaces propias de TypeScript para el tipado de los datos.
+## Arquitectura General
 
-### ⚙️ Backend (`/backend/`)
+El proyecto esta organizado como un monorepositorio:
 
-La **API REST** central está desarrollada en Python utilizando el framework **Django** junto con **Django Rest Framework (DRF)**.
+```txt
+UNI-SIGEA/
++-- frontend/   React + TypeScript + Vite + TailwindCSS
++-- backend/    Django + Django REST Framework
++-- docs/       Guias de validacion y documentacion tecnica
++-- README.md
+```
 
-- `/config/`: Configuraciones globales de Django (settings corporativos, ruteo maestro, WSGI, ASGI).
-- `/documental/`: La aplicación (app) principal del negocio. Contiene toda la lógica del módulo de documentos, expedientes, convocatorias, y postulantes.
-  - `models.py`: Esquemas de datos relacionales en Base de Datos (Postulantes, Documentos Requeridos, Convocatoria).
-  - `views.py`: Controladores o ViewSets de la API manejando las peticiones y dando respuesta JSON.
-  - `serializers.py`: Capa de serialización que transforma la DB a JSON útil para el frontend.
-- `/accounts/`: Aplicación independiente dedicada al manejo de autenticación de usuarios y perfiles personalizados.
+### Frontend
 
-### 📚 Documentación (`/docs/`)
+El frontend es una SPA construida con React, TypeScript y Vite.
 
-- Directorio de recursos de documentación extra, manuales técnicos o imágenes de apoyo del repositorio.
+Directorios principales:
 
----
+- `frontend/src/pages/`: vistas completas de la aplicacion.
+- `frontend/src/components/`: componentes reutilizables, layouts y chatbot.
+- `frontend/src/services/`: servicios para consumir la API del backend.
+- `frontend/src/hooks/`: hooks personalizados.
+- `frontend/src/contexts/`: estado global, principalmente autenticacion.
+- `frontend/src/lib/api.ts`: cliente HTTP central.
 
-## Enlaces del Frontend (Rutas / Vistas)
+Archivos clave del chatbot:
 
-A continuación se detallan las rutas principales de navegación de la aplicación en React/Vite, donde se gestionan los distintos modelos (CRUDs):
+```txt
+frontend/src/components/ChatBotDocumental.tsx
+frontend/src/services/chatbotService.ts
+```
 
-| Módulo / Acción              | Ruta en Frontend               | Descripción                                                                  |
-| ---------------------------- | ------------------------------ | ---------------------------------------------------------------------------- |
-| **Autenticación**            | `/login`                       | Pantalla de inicio de sesión de usuarios.                                    |
-| **Dashboard**                | `/`                            | Panel principal e inicio de la aplicación.                                   |
-| **Convocatorias**            | `/convocatorias`               | Listado y gestión principal (CRUD) de convocatorias.                         |
-| **Convocatoria (Nueva)**     | `/convocatorias/nueva`         | Formulario para la creación de una nueva convocatoria.                       |
-| **Convocatoria (Detalles)**  | `/convocatorias/:id`           | Vista detallada e información particular de una convocatoria.                |
-| **Convocatorias Archivadas** | `/convocatorias/archivadas`    | Vista de convocatorias en estado archivado.                                  |
-| **Documentos & Requisitos**  | `/documentos`                  | Gestión de documentos (incluye CRUD de Documento Requerido / Documentos).    |
-| **Doc. Semáforo**            | `/documentos/semaforo/:status` | Filtrado de documentos por estado de alerta/semáforo dependiendo del avance. |
-| **Postulantes**              | `/portal-postulante`           | Portal y registro de postulantes.                                            |
-| **Expedientes**              | `/expedientes`                 | Listado y CRUD general de expedientes de los aspirantes/postulantes.         |
-| **Usuarios**                 | `/usuarios`                    | Gestión y CRUD de usuarios del sistema.                                      |
+### Backend
 
----
+El backend es una API REST con Django y Django REST Framework.
 
-## Endpoints del Backend (API REST)
+Directorios principales:
 
-Los siguientes endpoints son provistos por el backend en Django Rest Framework (DRF) para realizar la gestión y operaciones CRUD en la base de datos:
+- `backend/config/`: configuracion global del proyecto Django.
+- `backend/accounts/`: autenticacion, registro, sesion y contrasenas.
+- `backend/documental/`: modulo principal de negocio documental.
+- `backend/documental/services/`: servicios internos como OCR, semaforo y chatbot.
+- `backend/media/`: archivos subidos por los usuarios.
 
-### Autenticación (`/api/auth/`)
+Archivos clave del chatbot:
 
-- `POST /api/auth/login/` - Autenticación y obtención de tokens JWT (Access y Refresh).
-- `POST /api/auth/refresh/` - Refresco del token de acceso JWT.
-- `POST /api/auth/register/` - Registro de nuevos usuarios.
-- `GET/PUT /api/auth/me/` - Obtención y actualización de información del usuario autenticado.
+```txt
+backend/documental/views.py
+backend/documental/services/gemini_service.py
+```
 
-### Módulo Documental y CRUDs genéricos (`/api/`)
+## Flujo De Funcionamiento Del Chatbot
 
-La mayoría de estos endpoints están respaldados por el `DefaultRouter` de DRF, e incluyen los predeterminados de un CRUD:
+```txt
+Usuario postulante
+   |
+Abre el boton flotante del chatbot
+   |
+Selecciona idioma: ES o EN
+   |
+Escribe una pregunta documental
+   |
+Frontend envia message + lang al backend
+   |
+Backend valida usuario, rol y mensaje
+   |
+Servicio documental procesa la consulta
+   |
+Si aplica, consulta Gemini
+   |
+Backend devuelve answer
+   |
+Frontend muestra la respuesta en el chat
+```
 
-- `GET` (Listar todos)
-- `POST` (Crear nuevo registro)
-- `GET {id}/` (Detalle de un registro en específico)
-- `PUT / PATCH {id}/` (Actualización parcial o total del registro)
-- `DELETE {id}/` (Eliminar registro)
+Ejemplo de solicitud en espanol:
 
-| Modelo              | Endpoint Principal Base       |
-| ------------------- | ----------------------------- |
-| **Postulantes**     | `/api/postulantes/`           |
-| **Convocatorias**   | `/api/convocatorias/`         |
-| **Doc. Requeridos** | `/api/documentos-requeridos/` |
-| **Documentos**      | `/api/documentos/`            |
-| **Usuarios Perfil** | `/api/usuarios-perfil/`       |
-| **Expedientes**     | `/api/expedientes/`           |
+```json
+{
+  "message": "Donde descargo el certificado de policia?",
+  "lang": "es"
+}
+```
 
-### Endpoints Especiales / Adicionales
+Ejemplo de solicitud en ingles:
 
-- **Dashboard Stats:** `GET /api/dashboard/stats/` (Métricas y conteos para la vista de estadísticas de la landing).
-- **Health Check:** `GET /api/health/` (Verificar la salud y si se encuentra encendida la API).
-- **Alias Requisitos (Crear):** `POST /api/requisitos/` (Atajo para creación de documentos requeridos).
-- **Alias Postulantes (Crear):** `POST /api/postulantes/` (Atajo para creación de postulantes).
+```json
+{
+  "message": "Where can I download the police certificate?",
+  "lang": "en"
+}
+```
 
+Ejemplo de respuesta:
+
+```json
+{
+  "answer": "Puedes obtener Certificado Policia Nacional en este enlace: https://antecedentes.policia.gov.co:7005/WebJudicial/. Debe validar numero de cedula y fecha reciente."
+}
+```
+
+## Comunicacion Frontend / Backend
+
+La comunicacion se realiza mediante API REST sobre HTTP.
+
+```txt
+React Frontend
+   |
+apiClient
+   | Authorization: Bearer <token>
+Django REST Framework
+   |
+Views / ViewSets
+   |
+Serializers / Services / Models
+   |
+Base de datos y archivos
+```
+
+El cliente HTTP central esta en:
+
+```txt
+frontend/src/lib/api.ts
+```
+
+Este cliente:
+
+- Usa `VITE_API_BASE_URL` como URL base.
+- Si no existe esa variable, usa `/api`.
+- Agrega automaticamente el token JWT desde `localStorage`.
+- Envia JSON para operaciones normales.
+- Envia `multipart/form-data` para carga de archivos.
+
+El servicio del chatbot llama:
+
+```ts
+chatbotService.ask(message, lang)
+```
+
+Internamente ejecuta:
+
+```ts
+apiClient.post("/chatbot/", { message, lang })
+```
+
+La URL final es:
+
+```txt
+POST /api/chatbot/
+```
+
+## Seguridad Del Chatbot
+
+El chatbot no es publico. Para usarlo, el backend valida que:
+
+- El usuario este autenticado.
+- El usuario tenga perfil documental.
+- El rol sea `postulante`.
+- El mensaje sea texto valido.
+- El mensaje no supere 500 caracteres.
+- El idioma sea `es` o `en`.
+
+Si alguna condicion no se cumple, el backend devuelve un error controlado.
+
+## Consumo De IA
+
+El frontend no consume Gemini directamente. La integracion con IA vive en el backend para proteger la API key y controlar el prompt.
+
+```txt
+Frontend React
+   |
+POST /api/chatbot/
+   |
+Backend Django
+   |
+gemini_service.py
+   |
+Google Gemini API
+   |
+Respuesta al backend
+   |
+Respuesta al frontend
+```
+
+Variables de entorno usadas por el servicio:
+
+```txt
+GEMINI_API_KEY
+GEMINI_MODEL
+```
+
+Si `GEMINI_MODEL` no esta definido, se usa:
+
+```txt
+gemini-2.5-flash
+```
+
+El backend construye un prompt controlado que indica al modelo:
+
+- Responder solo sobre documentos del proceso de vinculacion.
+- Usar el catalogo documental permitido.
+- Responder en el idioma seleccionado.
+- Mantener respuestas breves.
+- Incluir enlaces cuando el usuario pregunte donde obtener documentos.
+- Rechazar preguntas fuera del alcance documental.
+
+## Fallback Local
+
+El chatbot puede responder sin depender totalmente de Gemini.
+
+Antes de llamar al modelo, el backend revisa si puede responder con su catalogo local. Esto se usa especialmente para preguntas sobre enlaces o reglas conocidas.
+
+Tambien usa respuesta local si:
+
+- No existe `GEMINI_API_KEY`.
+- Gemini no responde.
+- La respuesta de Gemini no tiene el formato esperado.
+
+Esto permite que preguntas frecuentes sigan funcionando, por ejemplo:
+
+```txt
+Donde descargo antecedentes judiciales?
+```
+
+```txt
+Where can I download the police certificate?
+```
+
+## Endpoints Principales
+
+Autenticacion:
+
+```txt
+POST /api/auth/login/
+POST /api/auth/refresh/
+POST /api/auth/register/
+GET  /api/auth/me/
+POST /api/auth/change-password/
+POST /api/auth/forgot-password/
+POST /api/auth/reset-password/
+```
+
+Modulo documental:
+
+```txt
+GET/POST/PATCH/DELETE /api/postulantes/
+GET/POST/PATCH/DELETE /api/convocatorias/
+GET/POST/PATCH/DELETE /api/documentos-requeridos/
+GET/POST/PATCH/DELETE /api/documentos/
+GET/POST/PATCH/DELETE /api/usuarios-perfil/
+GET/POST/PATCH/DELETE /api/expedientes/
+GET                 /api/dashboard/stats/
+GET                 /api/health/
+POST                /api/chatbot/
+```
+
+## Modelos Principales
+
+El dominio documental se apoya en:
+
+- `UsuarioPerfil`: rol documental del usuario (`admin`, `revisor`, `postulante`).
+- `Postulante`: informacion personal del candidato.
+- `Convocatoria`: proceso de vinculacion.
+- `DocumentoRequerido`: documento solicitado en una convocatoria.
+- `Documento`: archivo cargado, estado, OCR, semaforo y observaciones.
+- `Expediente`: relacion entre postulante, convocatoria y documentos.
+
+## Variables De Entorno
+
+Backend:
+
+```txt
+DJANGO_SECRET_KEY
+DJANGO_DEBUG
+ALLOWED_HOSTS
+GDOC_DB_ENGINE
+GDOC_DB_NAME
+GDOC_DB_USER
+GDOC_DB_PASSWORD
+GDOC_DB_HOST
+GDOC_DB_PORT
+GEMINI_API_KEY
+GEMINI_MODEL
+```
+
+Frontend:
+
+```txt
+VITE_API_BASE_URL
+```
+
+## Ejecucion En Desarrollo
+
+Backend:
+
+```bash
+cd backend
+python manage.py runserver
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm run dev
+```
+
+## Validaciones Recomendadas
+
+Frontend:
+
+```bash
+cd frontend
+npm exec tsc -- -p tsconfig.app.json --noEmit
+```
+
+Backend:
+
+```bash
+backend\.venv\Scripts\python.exe backend\manage.py check
+```
+
+## Resumen
+
+UNI SIGEA es una aplicacion React + Django REST para gestion documental. El chatbot documental es una pieza central del portal del postulante: recibe preguntas en espanol o ingles, valida que pertenezcan al dominio documental, responde con informacion y enlaces utiles, y puede apoyarse en Gemini sin exponer claves ni logica sensible en el frontend.
